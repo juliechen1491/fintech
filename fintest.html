@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人財務分析測驗</title>
+    <meta name="description" content="快速評估您的金融知識與投資屬性，獲得專屬理財建議。">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(120deg, #e6f7ff, #e6ffed);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .floating { position: absolute; animation: float 8s infinite ease-in-out; opacity: 0.12; z-index: -1; }
+        @keyframes float { 0% {transform:translate(0,0) rotate(0deg);} 50% {transform:translate(0,-25px) rotate(3deg);} 100% {transform:translate(0,0) rotate(0deg);} }
+        .btn-option { transition: all 0.3s; }
+        .btn-option.selected, .btn-option:focus { border-color: #14b8a6; background: #f0fdfa; }
+        .progress-bar { transition: width 0.5s; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:1001; }
+        .modal-content { background:#fff; border-radius:8px; margin:5% auto; max-width:600px; padding:2rem; }
+        .trait-badge { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.875rem; font-weight:500; margin:0.25rem; }
+        .tool-tag { display:inline-block; padding:0.15rem 0.5rem; border-radius:9999px; font-size:0.75rem; margin:0.15rem; background-color:rgba(49,151,149,0.1); color:#2c7a7b; border:1px solid rgba(49,151,149,0.2); }
+        .recommendation-card { transition: all 0.3s; }
+        .recommendation-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div id="floating-elements"></div>
+    <main class="container mx-auto px-4 py-8 max-w-3xl relative z-10">
+        <section class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-teal-700 mb-2">個人財務分析測驗 💰</h1>
+            <p class="text-lg text-teal-600">測試您對金融概念的了解程度</p>
+        </section>
+        <div class="mb-6 bg-white rounded-full h-4 shadow-inner overflow-hidden">
+            <div id="progress-bar" class="progress-bar h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full" style="width:0%"></div>
+        </div>
+        <section id="quiz-container" class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <!-- 問題區、結果區動態切換 -->
+            <form id="user-info-form" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                    <input type="text" id="name" name="name" required autocomplete="name" class="form-input w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none">
+                </div>
+                <div>
+                    <label for="age" class="block text-sm font-medium text-gray-700 mb-1">年齡</label>
+                    <input type="number" id="age" name="age" min="18" max="120" required autocomplete="age" class="form-input w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none">
+                </div>
+                <div>
+                    <label for="occupation" class="block text-sm font-medium text-gray-700 mb-1">職業</label>
+                    <input type="text" id="occupation" name="occupation" required autocomplete="organization-title" class="form-input w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none">
+                </div>
+                <div>
+                    <label for="region" class="block text-sm font-medium text-gray-700 mb-1">居住地區</label>
+                    <select id="region" name="region" required class="form-input w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none">
+                        <option value="" disabled selected>請選擇您的居住地區</option>
+                        <option value="台北市">台北市</option>
+                        <option value="新北市">新北市</option>
+                        <option value="桃園市">桃園市</option>
+                        <option value="台中市">台中市</option>
+                        <option value="台南市">台南市</option>
+                        <option value="高雄市">高雄市</option>
+                        <option value="基隆市">基隆市</option>
+                        <option value="新竹市">新竹市</option>
+                        <option value="新竹縣">新竹縣</option>
+                        <option value="苗栗縣">苗栗縣</option>
+                        <option value="彰化縣">彰化縣</option>
+                        <option value="南投縣">南投縣</option>
+                        <option value="雲林縣">雲林縣</option>
+                        <option value="嘉義市">嘉義市</option>
+                        <option value="嘉義縣">嘉義縣</option>
+                        <option value="屏東縣">屏東縣</option>
+                        <option value="宜蘭縣">宜蘭縣</option>
+                        <option value="花蓮縣">花蓮縣</option>
+                        <option value="台東縣">台東縣</option>
+                        <option value="澎湖縣">澎湖縣</option>
+                        <option value="金門縣">金門縣</option>
+                        <option value="連江縣">連江縣</option>
+                        <option value="海外">海外</option>
+                    </select>
+                </div>
+                <button id="start-btn" type="submit" class="w-full bg-gradient-to-r from-teal-500 to-blue-500 text-white font-medium py-3 px-8 rounded-full mt-4">開始測驗 ▶️</button>
+            </form>
+            <div id="question-screen" class="hidden">
+                <div class="mb-1 flex justify-between items-center">
+                    <span id="question-number" class="text-sm font-medium text-teal-600"></span>
+                </div>
+                <h3 id="question-text" class="text-xl font-bold text-teal-800 mb-4"></h3>
+                <div id="options-container" class="space-y-3 mb-6"></div>
+                <div class="flex justify-between">
+                    <button id="prev-btn" class="hidden bg-gray-200 text-gray-700 py-2 px-4 rounded-lg">◀️ 上一題</button>
+                    <button id="next-btn" class="bg-teal-600 text-white py-2 px-6 rounded-lg ml-auto" disabled>下一題 ▶️</button>
+                </div>
+            </div>
+            <div id="result-screen" class="hidden"></div>
+        </section>
+    </main>
+    <script>
+        // Google Apps Script Web App URL
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/你的scriptID/exec";
+
+        // 浮動背景
+        function createFloatingElements() {
+            const floatingElements = document.getElementById('floating-elements');
+            const emojis = ['🔬', '🦠', '🧫', '🧪', '🧬'];
+            const count = 15;
+            for (let i = 0; i < count; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating';
+                element.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                element.style.fontSize = `${(Math.random() * 3 + 2).toFixed(2)}rem`;
+                element.style.left = `${(Math.random() * 100).toFixed(2)}%`;
+                element.style.top = `${(Math.random() * 100).toFixed(2)}%`;
+                element.style.animationDelay = `${(Math.random() * 5).toFixed(2)}s`;
+                element.style.animationDuration = `${(Math.random() * 5 + 5).toFixed(2)}s`;
+                floatingElements.appendChild(element);
+            }
+        }
+
+        // 題目與答案
+        const questions = [
+            {question: "您有多少年的投資經驗？ 📈", options: [
+                { text: "A. 5年以上", score: 4 },
+                { text: "B. 3-5年", score: 3 },
+                { text: "C. 1-3年", score: 2 },
+                { text: "D. 不到1年或無經驗", score: 1 }
+            ], category: "experience" },
+            {question: "您使用過哪些投資工具？ 🧰", options: [
+                { text: "A. 股票、債券、基金、期貨/選擇權等多種工具", score: 4 },
+                { text: "B. 股票、債券和基金", score: 3 },
+                { text: "C. 主要是基金或ETF", score: 2 },
+                { text: "D. 只有定存或保險", score: 1 }
+            ], category: "knowledge" },
+            {question: "當市場下跌時，您通常會如何反應？ 📉", options: [
+                { text: "A. 視為買入機會，增加投資", score: 4 },
+                { text: "B. 保持冷靜，堅持原有策略", score: 3 },
+                { text: "C. 有些擔憂，但不會立即行動", score: 2 },
+                { text: "D. 非常擔心，考慮賣出止損", score: 1 }
+            ], category: "risk_tolerance" },
+            {question: "您對自己的財務知識評價如何？ 📚", options: [
+                { text: "A. 非常了解各種金融產品和市場運作", score: 4 },
+                { text: "B. 了解基本的投資概念和策略", score: 3 },
+                { text: "C. 有一些基礎知識，但不夠全面", score: 2 },
+                { text: "D. 知識有限，需要更多學習", score: 1 }
+            ], category: "knowledge" },
+            {question: "您如何看待投資風險與回報的關係？ ⚖️", options: [
+                { text: "A. 願意承擔高風險以獲取高回報", score: 4 },
+                { text: "B. 偏好中等風險和回報的平衡", score: 3 },
+                { text: "C. 傾向於低風險投資，即使回報較低", score: 2 },
+                { text: "D. 極度厭惡風險，安全是首要考量", score: 1 }
+            ], category: "risk_tolerance" },
+            {question: "您的主要投資目標是什麼？ 🎯", options: [
+                { text: "A. 追求最大化資本增值，願意承擔波動", score: 4 },
+                { text: "B. 資本增值與收入平衡", score: 3 },
+                { text: "C. 保本為主，適度增值", score: 2 },
+                { text: "D. 保本保息，安全第一", score: 1 }
+            ], category: "goals" },
+            {question: "您計劃的投資時間範圍是多久？ ⏱️", options: [
+                { text: "A. 10年以上", score: 4 },
+                { text: "B. 5-10年", score: 3 },
+                { text: "C. 2-5年", score: 2 },
+                { text: "D. 2年以下", score: 1 }
+            ], category: "planning" },
+            {question: "您對財務規劃的態度是？ 📝", options: [
+                { text: "A. 有詳細的長期財務計劃並定期檢視", score: 4 },
+                { text: "B. 有基本計劃，偶爾檢視", score: 3 },
+                { text: "C. 有簡單想法，但沒有具體計劃", score: 2 },
+                { text: "D. 很少考慮長期財務規劃", score: 1 }
+            ], category: "planning" },
+            {question: "您如何看待市場波動？ 🌊", options: [
+                { text: "A. 了解市場週期，視為正常現象", score: 4 },
+                { text: "B. 接受波動，但會關注趨勢變化", score: 3 },
+                { text: "C. 有些不安，但能忍受短期波動", score: 2 },
+                { text: "D. 非常擔憂，偏好穩定性", score: 1 }
+            ], category: "market_knowledge" },
+            {question: "您做投資決策時主要依據什麼？ 🤔", options: [
+                { text: "A. 自己的研究和分析", score: 4 },
+                { text: "B. 結合專業建議和自己判斷", score: 3 },
+                { text: "C. 主要依賴專業顧問建議", score: 2 },
+                { text: "D. 跟隨親友或大眾意見", score: 1 }
+            ], category: "decision_making" }
+        ];
+        // ... resultLevels 定義同前（省略，與前述一致） ...
+        // ...（請將 resultLevels 複製至此）...
+
+        let currentQuestion = 0;
+        let totalScore = 0;
+        let userAnswers = [];
+        let categoryScores = {
+            experience: 0, knowledge: 0, risk_tolerance: 0, goals: 0, planning: 0, market_knowledge: 0, decision_making: 0
+        };
+        let userInfo = { name: "", age: "", occupation: "", region: "" };
+
+        const userInfoForm = document.getElementById('user-info-form');
+        const questionScreen = document.getElementById('question-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const questionNumber = document.getElementById('question-number');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        createFloatingElements();
+
+        // 啟動測驗
+        userInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            userInfo.name = document.getElementById('name').value.trim();
+            userInfo.age = document.getElementById('age').value.trim();
+            userInfo.occupation = document.getElementById('occupation').value.trim();
+            userInfo.region = document.getElementById('region').value;
+            if (!userInfo.name || !userInfo.age || !userInfo.occupation || !userInfo.region) {
+                showToast('請填寫所有必填欄位');
+                return;
+            }
+            userInfoForm.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            showQuestion();
+        });
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionNumber.textContent = `問題 ${currentQuestion + 1}/${questions.length}`;
+            questionText.textContent = question.question;
+            progressBar.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+            optionsContainer.innerHTML = '';
+            nextBtn.disabled = userAnswers[currentQuestion] === undefined;
+            question.options.forEach((option, idx) => {
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "btn-option w-full text-left p-4 rounded-lg border-2 transition-all mb-2" +
+                    (userAnswers[currentQuestion] === idx ? " selected border-teal-500 bg-teal-50" : " border-gray-200 hover:border-teal-300");
+                btn.innerHTML = option.text;
+                btn.tabIndex = 0;
+                btn.addEventListener('click', () => {
+                    selectOption(idx);
+                    nextBtn.disabled = false;
+                });
+                optionsContainer.appendChild(btn);
+            });
+            prevBtn.classList.toggle('hidden', currentQuestion === 0);
+            nextBtn.textContent = currentQuestion === questions.length - 1 ? '完成測驗 ✅' : '下一題 ▶️';
+        }
+
+        function selectOption(idx) {
+            const question = questions[currentQuestion];
+            const previous = userAnswers[currentQuestion];
+            userAnswers[currentQuestion] = idx;
+            if (previous !== undefined) {
+                totalScore -= question.options[previous].score;
+                if (question.category) categoryScores[question.category] -= question.options[previous].score;
+            }
+            totalScore += question.options[idx].score;
+            if (question.category) categoryScores[question.category] += question.options[idx].score;
+            Array.from(optionsContainer.children).forEach((btn, i) => {
+                btn.className = "btn-option w-full text-left p-4 rounded-lg border-2 transition-all mb-2" +
+                    (i === idx ? " selected border-teal-500 bg-teal-50" : " border-gray-200 hover:border-teal-300");
+            });
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (userAnswers[currentQuestion] === undefined) {
+                showToast('請選擇一個選項再繼續');
+                return;
+            }
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResult();
+            }
+        });
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        });
+
+        // 傳送到 Google Sheets
+        function sendToGoogleSheets(data) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(() => showToast("資料已送出！"))
+            .catch(() => showToast("資料送出失敗"));
+        }
+
+        function showResult() {
+            questionScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            progressBar.style.width = '100%';
+            let resultLevel = resultLevels[resultLevels.length - 1];
+            for (const level of resultLevels) {
+                if (totalScore >= level.min && totalScore <= level.max) {
+                    resultLevel = level; break;
+                }
+            }
+            const answerDetails = questions.map((q, idx) => ({
+                question: q.question,
+                answer: q.options[userAnswers[idx]]?.text || "",
+                score: q.options[userAnswers[idx]]?.score || 0
+            }));
+            // 將所有資料送出
+            sendToGoogleSheets({
+                name: userInfo.name,
+                age: userInfo.age,
+                occupation: userInfo.occupation,
+                region: userInfo.region,
+                totalScore,
+                resultTitle: resultLevel.title,
+                resultDescription: resultLevel.description,
+                personality: resultLevel.personality,
+                answers: answerDetails,
+                timestamp: new Date().toISOString()
+            });
+            // ...結果頁顯示同前（省略）...
+            //（請將前述 showResult 內容複製到這裡，或根據需求調整）
+            // 畫雷達圖
+            setTimeout(createAttributesChart, 200);
+            document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+        }
+
+        function createAttributesChart() {
+            const ctx = document.getElementById('attributes-chart');
+            if (!ctx) return;
+            const experienceP = (categoryScores.experience / 4) * 100;
+            const knowledgeP = ((categoryScores.knowledge + categoryScores.market_knowledge) / 8) * 100;
+            const riskToleranceP = (categoryScores.risk_tolerance / 8) * 100;
+            const planningP = ((categoryScores.planning + categoryScores.goals) / 8) * 100;
+            const decisionMakingP = (categoryScores.decision_making / 4) * 100;
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['投資經驗 📈', '金融知識 📚', '風險承受力 ⚖️', '財務規劃 📝', '決策能力 🤔'],
+                    datasets: [{
+                        label: '您的投資屬性',
+                        data: [experienceP, knowledgeP, riskToleranceP, planningP, decisionMakingP],
+                        backgroundColor: 'rgba(72, 187, 120, 0.2)',
+                        borderColor: 'rgba(72, 187, 120, 1)',
+                        pointBackgroundColor: 'rgba(72, 187, 120, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(72, 187, 120, 1)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 100, ticks: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            totalScore = 0;
+            userAnswers = [];
+            categoryScores = {experience:0,knowledge:0,risk_tolerance:0,goals:0,planning:0,market_knowledge:0,decision_making:0};
+            userInfo = { name: "", age: "", occupation: "", region: "" };
+            resultScreen.classList.add('hidden');
+            userInfoForm.reset();
+            userInfoForm.classList.remove('hidden');
+            progressBar.style.width = '0%';
+        }
+
+        function showToast(msg) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '32px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(16,115,115,.95)';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 24px';
+                toast.style.borderRadius = '999px';
+                toast.style.fontSize = '16px';
+                toast.style.boxShadow = '0 6px 24px rgba(0,0,0,.18)';
+                toast.style.zIndex = 9999;
+                document.body.appendChild(toast);
+            }
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 1800);
+        }
+    </script>
+</body>
+</html>
