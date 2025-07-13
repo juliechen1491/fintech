@@ -2,36 +2,33 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>聯絡表單</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 40px;
       max-width: 600px;
       margin: auto;
-      background-color: #f9f9f9;
+      padding: 40px;
+      background-color: #f2f2f2;
     }
 
     h2 {
       text-align: center;
-      color: #333;
     }
 
     label {
-      display: block;
-      margin-top: 15px;
       font-weight: bold;
+      display: block;
+      margin-top: 20px;
     }
 
     input, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      box-sizing: border-box;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
+      box-sizing: border-box;
     }
 
     button {
@@ -48,73 +45,23 @@
     button:hover {
       background-color: #45a049;
     }
-
-    #response {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #d63333;
-      text-align: center;
-    }
-
-    #response.success {
-      color: #2b7a2b;
-    }
   </style>
 </head>
 <body>
+
   <h2>聯絡我們</h2>
-  <form id="contact-form">
-    <label for="name">姓名</label>
-    <input type="text" id="name" name="name" required>
+  <form action="https://script.google.com/macros/s/AKfycbxyaZEiUe5nVvSDTLAC1Kp8EKevx7qY7xvLE8wuRYx7OsP4kkkYUFJip4ggs7BssFw/exec" method="POST" target="_blank">
+    <label for="name">姓名：</label>
+    <input type="text" name="name" id="name" required>
 
-    <label for="email">電子信箱</label>
-    <input type="email" id="email" name="email" required>
+    <label for="email">電子信箱：</label>
+    <input type="email" name="email" id="email" required>
 
-    <label for="message">訊息內容</label>
-    <textarea id="message" name="message" rows="5" required></textarea>
+    <label for="message">訊息內容：</label>
+    <textarea name="message" id="message" rows="5" required></textarea>
 
     <button type="submit">送出</button>
   </form>
 
-  <div id="response"></div>
-
-  <script>
-    const form = document.getElementById("contact-form");
-    const responseBox = document.getElementById("response");
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const formData = {
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        message: document.getElementById("message").value.trim()
-      };
-
-      fetch("https://script.google.com/macros/s/AKfycbxyaZEiUe5nVvSDTLAC1Kp8EKevx7qY7xvLE8wuRYx7OsP4kkkYUFJip4ggs7BssFw/exec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.result === "success") {
-          responseBox.textContent = "✅ 表單已成功送出，謝謝您！";
-          responseBox.className = "success";
-          form.reset();
-        } else {
-          responseBox.textContent = "❌ 送出失敗：" + (data.message || "請稍後再試。");
-          responseBox.className = "";
-        }
-      })
-      .catch(error => {
-        responseBox.textContent = "❌ 發送失敗：" + error.message;
-        responseBox.className = "";
-        console.error("錯誤訊息：", error);
-      });
-    });
-  </script>
 </body>
 </html>
