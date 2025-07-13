@@ -73,11 +73,15 @@
       };
 
       fetch("https://script.google.com/macros/s/AKfycbxd0FjOglLF_M3tbW5739MCe3HtDYf6fovnf8lRIIGBJ9sn34ywWEuBWkxJN-u3_4Ff/exec", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        }
+      method: "POST",
+      mode: "no-cors",  // ← 可嘗試加這行測試是否為 CORS 問題（但會無法取得回應內容）
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+      name: "測試",
+      email: "test@example.com",
+      message: "這是一則測試訊息"
       })
       .then(res => res.json())
       .then(response => {
