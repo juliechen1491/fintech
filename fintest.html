@@ -203,7 +203,7 @@
         let categoryScores = {
             experience: 0, knowledge: 0, risk_tolerance: 0, goals: 0, planning: 0, market_knowledge: 0, decision_making: 0
         };
-        let userInfo = { name: "", age: "", occupation: "", region: "" };
+        let userInfo = { name: "", age: "", occupation: "", email: "", region: "" };
 
         // ==== DOM ====
         const userInfoForm = document.getElementById('user-info-form');
@@ -325,8 +325,8 @@
                 name: userInfo.name,
                 age: userInfo.age,
                 occupation: userInfo.occupation,
-                region: userInfo.region,
                 email: userInfo.email,
+                region: userInfo.region,                
                 totalScore,
                 resultTitle: resultLevel.title,
                 resultDescription: resultLevel.description,
@@ -346,6 +346,7 @@
                     <div class="grid grid-cols-2 gap-2 text-sm">
                         <div><span class="text-gray-500">年齡：</span><span class="font-medium">${userInfo.age}</span></div>
                         <div><span class="text-gray-500">職業：</span><span class="font-medium">${userInfo.occupation}</span></div>
+                        <div><span class="text-gray-500">EMAIL：</span><span class="font-medium">${userInfo.email}</span></div>
                         <div><span class="text-gray-500">居住地區：</span><span class="font-medium">${userInfo.region}</span></div>
                     </div>
                 </div>
@@ -423,7 +424,7 @@
             totalScore = 0;
             userAnswers = [];
             categoryScores = {experience:0,knowledge:0,risk_tolerance:0,goals:0,planning:0,market_knowledge:0,decision_making:0};
-            userInfo = { name: "", age: "", occupation: "", region: "" };
+            userInfo = { name: "", age: "", occupation: "", email: "", region: "" };
             resultScreen.classList.add('hidden');
             userInfoForm.reset();
             userInfoForm.classList.remove('hidden');
