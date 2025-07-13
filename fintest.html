@@ -20,8 +20,6 @@
         .btn-option { transition: all 0.3s; }
         .btn-option.selected, .btn-option:focus { border-color: #14b8a6; background: #f0fdfa; }
         .progress-bar { transition: width 0.5s; }
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:1001; }
-        .modal-content { background:#fff; border-radius:8px; margin:5% auto; max-width:600px; padding:2rem; }
         .trait-badge { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.875rem; font-weight:500; margin:0.25rem; }
         .tool-tag { display:inline-block; padding:0.15rem 0.5rem; border-radius:9999px; font-size:0.75rem; margin:0.15rem; background-color:rgba(49,151,149,0.1); color:#2c7a7b; border:1px solid rgba(49,151,149,0.2); }
         .recommendation-card { transition: all 0.3s; }
@@ -39,7 +37,6 @@
             <div id="progress-bar" class="progress-bar h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full" style="width:0%"></div>
         </div>
         <section id="quiz-container" class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <!-- 問題區、結果區動態切換 -->
             <form id="user-info-form" class="space-y-4">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
@@ -99,28 +96,9 @@
         </section>
     </main>
     <script>
-        // Google Apps Script Web App URL
+        // ==== Google Apps Script Web App URL ====
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYusbFLQqGx7_xY8SupFzM-7hVg4ypxaoYr0cg74UVtC5-uthZeJZL75cX3Wwo-BBYkA/exec";
-
-        // 浮動背景
-        function createFloatingElements() {
-            const floatingElements = document.getElementById('floating-elements');
-            const emojis = ['🔬', '🦠', '🧫', '🧪', '🧬'];
-            const count = 15;
-            for (let i = 0; i < count; i++) {
-                const element = document.createElement('div');
-                element.className = 'floating';
-                element.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                element.style.fontSize = `${(Math.random() * 3 + 2).toFixed(2)}rem`;
-                element.style.left = `${(Math.random() * 100).toFixed(2)}%`;
-                element.style.top = `${(Math.random() * 100).toFixed(2)}%`;
-                element.style.animationDelay = `${(Math.random() * 5).toFixed(2)}s`;
-                element.style.animationDuration = `${(Math.random() * 5 + 5).toFixed(2)}s`;
-                floatingElements.appendChild(element);
-            }
-        }
-
-        // 題目與答案
+        // ==== 題目和等級定義 ====
         const questions = [
             {question: "您有多少年的投資經驗？ 📈", options: [
                 { text: "A. 5年以上", score: 4 },
@@ -183,9 +161,38 @@
                 { text: "D. 跟隨親友或大眾意見", score: 1 }
             ], category: "decision_making" }
         ];
-        // ... resultLevels 定義同前（省略，與前述一致） ...
-        // ...（請將 resultLevels 複製至此）...
+        const resultLevels = [
+            {min:35,max:40,title:"專業投資者 🏆",description:"您展現出專業級的金融知識和投資經驗。您了解市場運作機制，能夠制定複雜的投資策略，並在不同市場環境中做出明智決策。",icons:"🏆 💰 📈 🌟 🚀",personality:"積極進取型投資者",traits:[
+                {text:"高風險承受力",color:"bg-red-100 text-red-800"}, {text:"長期投資視野",color:"bg-blue-100 text-blue-800"}, {text:"市場洞察力強",color:"bg-purple-100 text-purple-800"}, {text:"決策果斷",color:"bg-orange-100 text-orange-800"}, {text:"自信獨立",color:"bg-green-100 text-green-800"}
+            ],recommendations:[
+                {title:"多元化高成長投資組合",description:"配置70%成長型資產（股票、ETF）、20%另類投資（REITs、商品）、10%固定收益",icon:"📈",tools:["彭博終端機","專業券商平台","投資組合管理軟體","財報分析工具"]},
+                {title:"主動型投資策略",description:"利用您的專業知識，採用價值投資或成長投資策略，定期調整投資組合",icon:"🔍",tools:["技術分析軟體","財務模型工具","市場數據訂閱服務","專業投資社群"]},
+                {title:"稅務優化策略",description:"考慮利用稅務優惠投資工具，如退休帳戶、特定投資計劃等",icon:"💼",tools:["稅務規劃軟體","專業會計顧問","跨國資產配置平台","稅務優化計算器"]}
+            ]},
+            {min:28,max:34,title:"進階投資者 🌟",description:"您具有豐富的投資知識和經驗。您了解多種投資工具，能夠制定合理的投資策略，並在市場波動時保持冷靜。",icons:"🌟 💼 📊 💡 🔝",personality:"均衡成長型投資者",traits:[
+                {text:"中高風險承受力",color:"bg-orange-100 text-orange-800"}, {text:"理性分析",color:"bg-blue-100 text-blue-800"}, {text:"適應性強",color:"bg-teal-100 text-teal-800"}, {text:"穩健進取",color:"bg-indigo-100 text-indigo-800"}
+            ],recommendations:[
+                {title:"均衡成長投資組合",description:"配置60%成長型資產、30%固定收益資產、10%現金或等價物",icon:"⚖️",tools:["智能投資平台","ETF篩選工具","資產配置計算器","投資組合追蹤App"]},
+                {title:"定期再平衡策略",description:"每季檢視投資組合，根據市場變化和個人目標進行調整",icon:"🔄",tools:["投資組合分析工具","再平衡提醒服務","市場趨勢追蹤App","風險評估工具"]},
+                {title:"系統性投資計劃",description:"建立自動化投資系統，減少情緒化決策的影響",icon:"⏱️",tools:["自動化投資平台","定期定額投資服務","投資日曆工具","目標追蹤App"]}
+            ]},
+            {min:20,max:27,title:"中級投資者 💡",description:"您具備基本的金融知識，並有一定的投資經驗。您了解基本的投資概念，但可能需要在某些領域深入學習。",icons:"💡 📚 📝 🔍 📊",personality:"穩健成長型投資者",traits:[
+                {text:"中等風險承受力",color:"bg-yellow-100 text-yellow-800"}, {text:"謹慎決策",color:"bg-blue-100 text-blue-800"}, {text:"學習意願強",color:"bg-green-100 text-green-800"}, {text:"尋求平衡",color:"bg-purple-100 text-purple-800"}
+            ],recommendations:[
+                {title:"穩健成長投資組合",description:"配置50%成長型資產、40%固定收益資產、10%現金或等價物",icon:"🌱",tools:["基金篩選平台","指數ETF追蹤工具","風險評估問卷","基本投資組合模板"]},
+                {title:"指數投資策略",description:"考慮使用指數基金或ETF進行低成本、分散化投資",icon:"📊",tools:["低成本指數基金平台","ETF比較工具","被動投資指南","費用比較計算器"]},
+                {title:"持續學習計劃",description:"參加投資課程或研討會，提升金融知識和投資技能",icon:"📚",tools:["投資學習App","金融知識網站訂閱","投資書籍推薦清單","線上課程平台"]}
+            ]},
+            {min:10,max:19,title:"初級投資者 🌱",description:"您正在開始您的投資旅程。您對金融市場有基本了解，但需要更多學習和經驗來建立信心。",icons:"🌱 🔰 📘 🧩 🔍",personality:"保守穩健型投資者",traits:[
+                {text:"低風險承受力",color:"bg-green-100 text-green-800"}, {text:"保守謹慎",color:"bg-blue-100 text-blue-800"}, {text:"安全導向",color:"bg-teal-100 text-teal-800"}, {text:"初學成長中",color:"bg-yellow-100 text-yellow-800"}
+            ],recommendations:[
+                {title:"保守穩健投資組合",description:"配置30%成長型資產、50%固定收益資產、20%現金或等價物",icon:"🛡️",tools:["入門投資App","保守型基金篩選器","儲蓄計算工具","風險評估問卷"]},
+                {title:"定額定期投資",description:"採用定額定期投資策略，降低市場波動風險",icon:"📅",tools:["自動儲蓄App","定期定額投資平台","小額投資工具","投資習慣追蹤器"]},
+                {title:"基礎金融教育",description:"閱讀投資入門書籍，參加基礎理財課程，建立穩固的金融知識基礎",icon:"📖",tools:["金融入門App","基礎理財課程","投資詞彙表","理財社群平台"]}
+            ]}
+        ];
 
+        // ==== 狀態變數 ====
         let currentQuestion = 0;
         let totalScore = 0;
         let userAnswers = [];
@@ -194,10 +201,10 @@
         };
         let userInfo = { name: "", age: "", occupation: "", region: "" };
 
+        // ==== DOM ====
         const userInfoForm = document.getElementById('user-info-form');
         const questionScreen = document.getElementById('question-screen');
         const resultScreen = document.getElementById('result-screen');
-        const startBtn = document.getElementById('start-btn');
         const nextBtn = document.getElementById('next-btn');
         const prevBtn = document.getElementById('prev-btn');
         const progressBar = document.getElementById('progress-bar');
@@ -206,7 +213,6 @@
         const optionsContainer = document.getElementById('options-container');
         createFloatingElements();
 
-        // 啟動測驗
         userInfoForm.addEventListener('submit', (e) => {
             e.preventDefault();
             userInfo.name = document.getElementById('name').value.trim();
@@ -281,7 +287,7 @@
             }
         });
 
-        // 傳送到 Google Sheets
+        // ==== Google Sheets 傳送 ====
         function sendToGoogleSheets(data) {
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -293,6 +299,7 @@
             .catch(() => showToast("資料送出失敗"));
         }
 
+        // ==== 結果顯示 ====
         function showResult() {
             questionScreen.classList.add('hidden');
             resultScreen.classList.remove('hidden');
@@ -308,7 +315,7 @@
                 answer: q.options[userAnswers[idx]]?.text || "",
                 score: q.options[userAnswers[idx]]?.score || 0
             }));
-            // 將所有資料送出
+            // 傳送到 Google Sheets
             sendToGoogleSheets({
                 name: userInfo.name,
                 age: userInfo.age,
@@ -321,9 +328,54 @@
                 answers: answerDetails,
                 timestamp: new Date().toISOString()
             });
-            // ...結果頁顯示同前（省略）...
-            //（請將前述 showResult 內容複製到這裡，或根據需求調整）
-            // 畫雷達圖
+            // 結果 UI
+            resultScreen.innerHTML = `
+                <h2 class="text-2xl font-bold text-center text-teal-700 mb-4">${userInfo.name} 的財務分析結果</h2>
+                <div class="text-center mb-6">
+                    <div class="text-3xl mb-4">${resultLevel.icons.split(' ').map(icon=>`<span class="celebration">${icon}</span>`).join('')}</div>
+                    <p class="text-lg text-gray-700">${resultLevel.description}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-bold text-gray-700 mb-2">個人資訊</h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div><span class="text-gray-500">年齡：</span><span class="font-medium">${userInfo.age}</span></div>
+                        <div><span class="text-gray-500">職業：</span><span class="font-medium">${userInfo.occupation}</span></div>
+                        <div><span class="text-gray-500">居住地區：</span><span class="font-medium">${userInfo.region}</span></div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                    <h3 class="font-bold text-blue-700 mb-2">您的投資人格特質</h3>
+                    <p class="text-blue-600 mb-3">${resultLevel.personality}</p>
+                    <div>${resultLevel.traits.map(trait=>`<span class="trait-badge ${trait.color}">${trait.text}</span>`).join('')}</div>
+                </div>
+                <div class="mb-6">
+                    <h3 class="font-bold text-teal-700 mb-3">您的投資屬性分析</h3>
+                    <div class="chart-container" style="position:relative;height:250px;width:100%;max-width:500px;margin:0 auto;">
+                        <canvas id="attributes-chart"></canvas>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h3 class="font-bold text-teal-700 mb-3">專屬理財建議</h3>
+                    <div>
+                    ${resultLevel.recommendations.map(rec=>`
+                        <div class="recommendation-card bg-white p-4 rounded-lg shadow-md border-l-4 border-teal-500 mb-4">
+                            <div class="flex items-start">
+                                <span class="text-3xl mr-3">${rec.icon}</span>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-teal-700">${rec.title}</h4>
+                                    <p class="text-gray-600">${rec.description}</p>
+                                    <div class="mt-2 pt-2 border-t border-gray-100">
+                                        <p class="text-xs text-teal-700 font-medium mb-1">建議工具：</p>
+                                        <div class="flex flex-wrap">${rec.tools.map(tool=>`<span class="tool-tag">${tool}</span>`).join('')}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    </div>
+                </div>
+                <button id="restart-btn" class="w-full bg-gradient-to-r from-teal-500 to-blue-500 text-white font-medium py-3 px-8 rounded-full">重新測驗 🔄</button>
+            `;
             setTimeout(createAttributesChart, 200);
             document.getElementById('restart-btn').addEventListener('click', restartQuiz);
         }
@@ -370,6 +422,23 @@
             userInfoForm.reset();
             userInfoForm.classList.remove('hidden');
             progressBar.style.width = '0%';
+        }
+
+        function createFloatingElements() {
+            const floatingElements = document.getElementById('floating-elements');
+            const emojis = ['🔬', '🦠', '🧫', '🧪', '🧬'];
+            const count = 15;
+            for (let i = 0; i < count; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating';
+                element.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                element.style.fontSize = `${(Math.random() * 3 + 2).toFixed(2)}rem`;
+                element.style.left = `${(Math.random() * 100).toFixed(2)}%`;
+                element.style.top = `${(Math.random() * 100).toFixed(2)}%`;
+                element.style.animationDelay = `${(Math.random() * 5).toFixed(2)}s`;
+                element.style.animationDuration = `${(Math.random() * 5 + 5).toFixed(2)}s`;
+                floatingElements.appendChild(element);
+            }
         }
 
         function showToast(msg) {
