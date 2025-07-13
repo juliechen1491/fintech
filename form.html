@@ -2,36 +2,47 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>聯絡表單</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      padding: 40px;
       max-width: 600px;
       margin: auto;
+      background-color: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
     }
 
     label {
       display: block;
-      margin-top: 10px;
+      margin-top: 15px;
       font-weight: bold;
     }
 
     input, textarea {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 5px;
       box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fff;
     }
 
     button {
-      margin-top: 15px;
-      padding: 10px 20px;
+      margin-top: 20px;
+      padding: 12px 20px;
       background-color: #4CAF50;
       color: white;
       border: none;
-      cursor: pointer;
+      border-radius: 6px;
       font-size: 16px;
+      cursor: pointer;
     }
 
     button:hover {
@@ -41,6 +52,12 @@
     #response {
       margin-top: 20px;
       font-weight: bold;
+      color: #d63333;
+      text-align: center;
+    }
+
+    #response.success {
+      color: #2b7a2b;
     }
   </style>
 </head>
@@ -63,36 +80,40 @@
 
   <script>
     const form = document.getElementById("contact-form");
+    const responseBox = document.getElementById("response");
+
     form.addEventListener("submit", function(e) {
       e.preventDefault();
 
       const formData = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        message: document.getElementById("message").value
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        message: document.getElementById("message").value.trim()
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbxd0FjOglLF_M3tbW5739MCe3HtDYf6fovnf8lRIIGBJ9sn34ywWEuBWkxJN-u3_4Ff/exec", {
-      method: "POST",
-      mode: "no-cors",  // ← 可嘗試加這行測試是否為 CORS 問題（但會無法取得回應內容）
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-      name: "測試",
-      email: "test@example.com",
-      message: "這是一則測試訊息"
+      fetch("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       })
       .then(res => res.json())
-      .then(response => {
-        document.getElementById("response").innerText = "✅ 已成功送出表單，謝謝您！";
-        form.reset();
+      .then(data => {
+        if (data.result === "success") {
+          responseBox.textContent = "✅ 表單已成功送出，謝謝您！";
+          responseBox.className = "success";
+          form.reset();
+        } else {
+          responseBox.textContent = "❌ 送出失敗：" + (data.message || "請稍後再試。");
+          responseBox.className = "";
+        }
       })
-.catch(error => {
-  document.getElementById("response").innerText =
-    "發送失敗，請稍後再試。\n" + error.message;
-  console.error("Error details:", error);
-});
+      .catch(error => {
+        responseBox.textContent = "❌ 發送失敗：" + error.message;
+        responseBox.className = "";
+        console.error("錯誤訊息：", error);
+      });
     });
   </script>
 </body>
