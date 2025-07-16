@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>個人財務分析表單（分頁版）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #f9f5f0;
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+    form {
+      background-color: #fff8f4;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(150, 115, 90, 0.2);
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      color: #5c4a3c;
+    }
+    h2, h3 {
+      text-align: center;
+      color: #8c6d5d;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #d8c3b1;
+      border-radius: 6px;
+      background-color: #fff;
+      font-size: 1rem;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      background-color: #d8bfa6;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #c5aa91;
+    }
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <form action="https://docs.google.com/forms/d/1frsupgx2TVoZ0Za7WVFY0HMdXdugkpN7okfZbM6s9ac/formResponse" method="POST" target="_self">
+    <h2>📊 個人財務分析測驗</h2>
+
+    <!-- Step 1 -->
+    <div class="step active" id="step1">
+      <h3>🧾 第一段：資產分佈</h3>
+      <label>你的暱稱</label>
+      <input name="entry.666202297" type="text" required />
+      <label>股票金額</label>
+      <input name="entry.1703509608" type="number" />
+      <label>ETF 金額</label>
+      <input name="entry.141743674" type="number" />
+      <label>債券金額</label>
+      <input name="entry.73100025" type="number" />
+      <label>定存金額</label>
+      <input name="entry.316256601" type="number" />
+      <label>房地產價值</label>
+      <input name="entry.1549202436" type="number" />
+      <label>現金</label>
+      <input name="entry.399568205" type="number" />
+      <div class="button-group">
+        <button type="button" onclick="nextStep(2)">下一步 ▶</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="step2">
+      <h3>⏳ 第二段：退休規劃</h3>
+      <label>目前歲數</label>
+      <input name="entry.321739285" type="number" />
+      <label>預計退休年紀</label>
+      <input name="entry.107038055" type="number" />
+      <label>預計活到的年紀</label>
+      <input name="entry.1798841964" type="number" />
+      <label>退休後預期每個月花費</label>
+      <input name="entry.1360114314" type="number" />
+      <label>目前已經準備的退休金</label>
+      <input name="entry.608107280" type="number" />
+      <label>預期平均報酬率（百分比，如 5% 請填 5）</label>
+      <input name="entry.1748511127" type="number" placeholder="例如：5" />
+      <div class="button-group">
+        <button type="button" onclick="nextStep(1)">◀ 上一步</button>
+        <button type="submit">📮 送出</button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    function nextStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + step).classList.add('active');
+    }
+  </script>
+</body>
+</html>
