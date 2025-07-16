@@ -137,7 +137,7 @@
         expected_rate: form.expected_rate.value
       };
 
-      fetch('/exec', {  // 當做 Web App 部署時會對應 Apps Script 端點
+      fetch('https://script.google.com/macros/s/AKfycbwQYemsm2ZU9NQrj6zOoyncPRSZNdbuJ3ypgIqH3vWZQa8HJmWjzg5yn89L3ycAjTWP/exec', {  // 當做 Web App 部署時會對應 Apps Script 端點
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
